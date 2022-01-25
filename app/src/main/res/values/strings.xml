@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MyDiary</string>
+    <string name="toast_save_data_success">Выгружено успешно</string>
+    <string name="toast_some_error">Ошибка</string>
+    <string name="toast_load_data_success">Загружено успешно</string>
+    <string name="item_load">Загрузить</string>
+    <string name="item_save">Выгрузить</string>
 </resources>

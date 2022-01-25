@@ -10,19 +10,6 @@ class Entry(
     val time: Long
 )
 
-fun Entry.toEntryEntity() = EntryEntity(
-    id = id,
-    type = type,
-    time = time
-)
-
-fun EntryEntity.toEntry() = Entry(
-    id = id,
-    type = type,
-    time = time
-)
-
-
 fun Entry.formatTimeList(): String {
     val dt = System.currentTimeMillis() - time
     val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")

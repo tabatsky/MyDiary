@@ -5,9 +5,9 @@ import jatx.mydiary.database.entity.toEntryEntity
 import jatx.mydiary.domain.models.Entry
 import javax.inject.Inject
 
-class InsertUseCase @Inject constructor(
+class InsertReplaceListUseCase @Inject constructor(
     private val entryDao: EntryDao
 ) {
-    fun execute(entry: Entry) = entryDao
-        .insert(entry.toEntryEntity())
+    suspend fun execute(list: List<Entry>) = entryDao
+        .insertReplaceList(list.map { it.toEntryEntity() })
 }

@@ -1,8 +1,8 @@
 package jatx.mydiary.domain.usecase
 
 import jatx.mydiary.database.dao.EntryDao
+import jatx.mydiary.database.entity.toEntryEntity
 import jatx.mydiary.domain.models.Entry
-import jatx.mydiary.domain.models.toEntryEntity
 import javax.inject.Inject
 
 class DeleteUseCase @Inject constructor(

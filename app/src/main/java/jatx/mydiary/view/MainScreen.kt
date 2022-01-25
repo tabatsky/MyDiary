@@ -8,17 +8,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,6 +59,9 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
                         text = "MyDiary",
                         color = Color.White
                     )
+                },
+                actions = {
+                    MainScreenActions()
                 },
                 backgroundColor = Color.Black
             )
@@ -190,11 +190,12 @@ private fun FooterButton(modifier: Modifier, type: Int, mainViewModel: MainViewM
                 .background(getColorByType(type))
                 .combinedClickable(
                     onClick = {
-                        val entry = Entry(
-                            type = type,
-                            time = System.currentTimeMillis()
-                        )
-                        mainViewModel.insertEntry(entry)
+                        mainViewModel.setTypeForEntry(type)
+                        mainViewModel.createEntry()
+                    },
+                    onLongClick = {
+                        mainViewModel.setTypeForEntry(type)
+                        mainViewModel.showDateTimePicker()
                     }
                 )
         ) {
@@ -268,6 +269,40 @@ private fun ItemList(modifier: Modifier, entry: Entry?, mainViewModel: MainViewM
                 modifier = Modifier
                     .background(Color.Transparent)
                     .align(Alignment.CenterStart)
+            )
+        }
+    }
+}
+
+@Composable
+private fun MainScreenActions() {
+    val mainViewModel: MainViewModel = viewModel()
+    var expanded by remember { mutableStateOf(false) }
+
+    IconButton(
+        onClick = { expanded = !expanded }
+    ) {
+        Icon(painterResource(id = R.drawable.ic_question),
+            "", tint = Color.White)
+    }
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = {
+            expanded = false
+        }
+    ) {
+        DropdownMenuItem(onClick = {
+            mainViewModel.loadData()
+        }) {
+            Text(
+                text = stringResource(id = R.string.item_load)
+            )
+        }
+        DropdownMenuItem(onClick = {
+            mainViewModel.saveData()
+        }) {
+            Text(
+                text = stringResource(id = R.string.item_save)
             )
         }
     }
