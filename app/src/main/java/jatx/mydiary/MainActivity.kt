@@ -4,8 +4,6 @@ import android.Manifest
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.widget.TimePicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,17 +11,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.google.gson.Gson
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import jatx.mydiary.backup.BackupData
 import jatx.mydiary.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.PrintWriter
 import java.util.*
 
 @AndroidEntryPoint
@@ -63,31 +59,39 @@ class MainActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
-            withContext(Dispatchers.Default) {
-                mainViewModel.loadFlow.collect {
-                    withContext(Dispatchers.Main) {
-                        loadData()
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                withContext(Dispatchers.Default) {
+                    mainViewModel.loadFlow.collect {
+                        withContext(Dispatchers.Main) {
+                            loadData()
+                        }
                     }
                 }
             }
         }
 
         lifecycleScope.launch {
-            withContext(Dispatchers.Default) {
-                mainViewModel.saveFlow.collect {
-                    withContext(Dispatchers.Main) {
-                        Log.e("flow", "saveData")
-                        saveData()
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                withContext(Dispatchers.Default) {
+                    mainViewModel.saveFlow.collect {
+                        withContext(Dispatchers.Main) {
+                           saveData()
+                        }
                     }
                 }
             }
         }
 
         lifecycleScope.launch {
-            withContext(Dispatchers.Default) {
-                mainViewModel.dateTimePickerFlow.collect {
-                    withContext(Dispatchers.Main) {
-                        selectDate()
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                withContext(Dispatchers.Default) {
+                    mainViewModel.dateTimePickerFlow.collect {
+                        withContext(Dispatchers.Main) {
+                            selectDateAndTime {
+                                val time = calendar?.timeInMillis ?: System.currentTimeMillis()
+                                mainViewModel.createEntry(time)
+                            }
+                        }
                     }
                 }
             }
@@ -105,7 +109,7 @@ class MainActivity : ComponentActivity() {
         )
     )
 
-    private fun selectDate() {
+    private fun selectDateAndTime(onSuccess: () -> Unit) {
         calendar = Calendar.getInstance()
         calendar?.timeInMillis = System.currentTimeMillis()
 
@@ -118,13 +122,13 @@ class MainActivity : ComponentActivity() {
             calendar?.set(Calendar.MONTH, month)
             calendar?.set(Calendar.DAY_OF_MONTH, day)
 
-            selectTime()
+            selectTime(onSuccess)
         }, year, month, day)
 
         dpd.show()
     }
 
-    private fun selectTime() {
+    private fun selectTime(onSuccess: () -> Unit) {
         val hour = calendar?.get(Calendar.HOUR_OF_DAY) ?: 0
         val minute = calendar?.get(Calendar.MINUTE) ?: 0
 
@@ -132,8 +136,7 @@ class MainActivity : ComponentActivity() {
             calendar?.set(Calendar.HOUR_OF_DAY, hour)
             calendar?.set(Calendar.MINUTE, minute)
 
-            val time = calendar?.timeInMillis ?: System.currentTimeMillis()
-            mainViewModel.createEntry(time)
+            onSuccess()
         }, hour, minute, true)
 
         tpd.show()
