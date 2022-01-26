@@ -308,13 +308,5 @@ private fun MainScreenActions() {
     }
 }
 
-private fun List<Entry?>.mapToPairs(): List<Pair<Entry?, Entry?>> {
-    val arrayList = arrayListOf<Pair<Entry?, Entry?>>()
-    for (i in 0 until size / 2) {
-        arrayList.add(this[2*i] to this[2*i+1])
-    }
-    if (size % 2 == 1) {
-        arrayList.add(last() to null)
-    }
-    return arrayList
-}
+private fun <T> List<T>.mapToPairs(): List<Pair<T?, T?>> = chunked(2)
+    .map { it[0] to it.getOrNull(1) }
