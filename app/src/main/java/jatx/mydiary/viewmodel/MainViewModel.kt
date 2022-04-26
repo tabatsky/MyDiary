@@ -35,6 +35,9 @@ class MainViewModel @Inject constructor(
     private val _entries = MutableStateFlow(listOf<Entry>())
     val entries = _entries.asStateFlow()
 
+    private val _currentType = MutableStateFlow(-1)
+    val currentType = _currentType.asStateFlow()
+
     private val _showDeleteDialog = MutableStateFlow(false)
     val showDeleteDialog = _showDeleteDialog.asStateFlow()
 
@@ -45,7 +48,7 @@ class MainViewModel @Inject constructor(
     val invalidateCounter = _invalidateCounter.asStateFlow()
 
     private var _typeForEntry = MutableStateFlow(-1)
-    val typeForEntry = _typeForEntry.asStateFlow()
+    private val typeForEntry = _typeForEntry.asStateFlow()
 
     private var onLoadPermissionRequest: () -> Unit = {}
     private var onSavePermissionRequest: () -> Unit = {}
@@ -88,6 +91,13 @@ class MainViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 getAllUseCase
                     .execute()
+                    .combine(currentType) { list, type ->
+                        if (type == -1) {
+                            list
+                        } else {
+                            list.filter { it.type == type }
+                        }
+                    }
                     .collect {
                         withContext(Dispatchers.Main) {
                             _entries.value = it
@@ -95,6 +105,14 @@ class MainViewModel @Inject constructor(
                         }
                     }
             }
+        }
+    }
+
+    fun setCurrentType(type: Int) {
+        if (currentType.value != type) {
+            _currentType.value = type
+        } else {
+            _currentType.value = -1
         }
     }
 

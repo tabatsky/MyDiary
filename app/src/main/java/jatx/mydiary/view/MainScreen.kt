@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -84,11 +85,15 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
                         ItemTop(
                             modifier = modifier,
                             entry = pair.first,
-                            type = typeFirst)
+                            type = typeFirst,
+                            mainViewModel = mainViewModel
+                        )
                         ItemTop(
                             modifier = modifier,
                             entry = pair.second,
-                            type = typeSecond)
+                            type = typeSecond,
+                            mainViewModel = mainViewModel
+                        )
                     }
                 }
             }
@@ -212,9 +217,14 @@ private fun FooterButton(modifier: Modifier, type: Int, mainViewModel: MainViewM
 }
 
 @ExperimentalGraphicsApi
+@ExperimentalFoundationApi
 @Composable
-private fun ItemTop(modifier: Modifier, entry: Entry?, type: Int) {
+private fun ItemTop(modifier: Modifier, entry: Entry?, type: Int, mainViewModel: MainViewModel) {
     val timeStr = entry?.formatTimeTop() ?: "никогда"
+
+    val currentType by mainViewModel.currentType.collectAsState()
+
+    val fontWeight = if (type == currentType) FontWeight.Bold else FontWeight.Normal
 
     Box(
         modifier = modifier
@@ -225,10 +235,16 @@ private fun ItemTop(modifier: Modifier, entry: Entry?, type: Int) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(getColorByType(type))
+                .combinedClickable(
+                    onClick = {
+                        mainViewModel.setCurrentType(type)
+                    }
+                )
         ) {
             Text(
                 text = timeStr,
                 fontSize = 18.sp,
+                fontWeight = fontWeight,
                 color = Color.Black,
                 modifier = Modifier
                     .background(Color.Transparent)
