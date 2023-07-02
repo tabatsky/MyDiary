@@ -9,7 +9,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jatx.mydiary.R
 import jatx.mydiary.backup.BackupData
 import jatx.mydiary.domain.models.Entry
-import jatx.mydiary.domain.models.formatTimeList
 import jatx.mydiary.domain.usecase.*
 import jatx.mydiary.toasts.Toasts
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +28,7 @@ class MainViewModel @Inject constructor(
     private val getAllSuspendUseCase: GetAllSuspendUseCase,
     private val insertUseCase: InsertUseCase,
     private val deleteUseCase: DeleteUseCase,
+    private val deleteByTypeUseCase: DeleteByTypeUseCase,
     private val insertReplaceListUseCase: InsertReplaceListUseCase,
     private val toasts: Toasts
 ): ViewModel() {
@@ -43,6 +43,12 @@ class MainViewModel @Inject constructor(
 
     private val _entryToDelete = MutableStateFlow<Entry?>(null)
     val entryToDelete = _entryToDelete.asStateFlow()
+
+    private val _showDeleteByTypeDialog = MutableStateFlow(false)
+    val showDeleteByTypeDialog = _showDeleteByTypeDialog.asStateFlow()
+
+    private val _typeToDelete = MutableStateFlow(-1)
+    val typeToDelete = _typeToDelete.asStateFlow()
 
     private val _invalidateCounter = MutableStateFlow(0)
     val invalidateCounter = _invalidateCounter.asStateFlow()
@@ -125,7 +131,9 @@ class MainViewModel @Inject constructor(
             type = typeForEntry.value,
             time = System.currentTimeMillis()
         )
-        insertUseCase.execute(entry)
+        viewModelScope.launch {
+            insertUseCase.execute(entry)
+        }
     }
 
     fun createEntry(time: Long) {
@@ -133,13 +141,22 @@ class MainViewModel @Inject constructor(
             type = typeForEntry.value,
             time = time
         )
-        insertUseCase.execute(entry)
+        viewModelScope.launch {
+            insertUseCase.execute(entry)
+        }
     }
 
     fun deleteEntry() {
-        Log.e("delete", entryToDelete.value?.formatTimeList() ?: "null")
         entryToDelete.value?.let {
-            deleteUseCase.execute(it)
+            viewModelScope.launch {
+                deleteUseCase.execute(it)
+            }
+        }
+    }
+
+    fun deleteByType() {
+        viewModelScope.launch {
+            deleteByTypeUseCase.execute(typeToDelete.value)
         }
     }
 
@@ -147,9 +164,18 @@ class MainViewModel @Inject constructor(
         _entryToDelete.value = entry
     }
 
-    fun setShowDeleteDialog(value: Boolean, ) {
+    fun setShowDeleteDialog(value: Boolean) {
         _showDeleteDialog.value = value
     }
+
+    fun setTypeToDelete(type: Int) {
+        _typeToDelete.value = type
+    }
+
+    fun setShowDeleteByTypeDialog(value: Boolean) {
+        _showDeleteByTypeDialog.value = value
+    }
+
 
     fun onLoadPermissionGranted() {
         viewModelScope.launch {

@@ -142,41 +142,85 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
             }
         }
 
-        val showDeleteDialog by mainViewModel.showDeleteDialog.collectAsState()
-        val entryToDelete by mainViewModel.entryToDelete.collectAsState()
+        DeleteDialog()
+        DeleteByTypeDialog()
+    }
+}
 
-        if (showDeleteDialog) {
-            AlertDialog(
-                onDismissRequest = {
-                    mainViewModel.setShowDeleteDialog(false)
-                },
-                title = {
-                    Text("Удалить запись?")
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            mainViewModel.setShowDeleteDialog(false)
-                            mainViewModel.deleteEntry()
-                        },
-                    ) {
-                        Text("Да")
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = {
-                            mainViewModel.setShowDeleteDialog(false)
-                        },
-                    ) {
-                        Text("Нет")
-                    }
-                },
-                text = {
-                    Text(entryToDelete?.formatTimeList() ?: "")
+
+@Composable
+private fun DeleteDialog(mainViewModel: MainViewModel = viewModel()) {
+
+    val showDeleteDialog by mainViewModel.showDeleteDialog.collectAsState()
+    val entryToDelete by mainViewModel.entryToDelete.collectAsState()
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                mainViewModel.setShowDeleteDialog(false)
+            },
+            title = {
+                Text("Удалить запись?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mainViewModel.setShowDeleteDialog(false)
+                        mainViewModel.deleteEntry()
+                    },
+                ) {
+                    Text("Да")
                 }
-            )
-        }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        mainViewModel.setShowDeleteDialog(false)
+                    },
+                ) {
+                    Text("Нет")
+                }
+            },
+            text = {
+                Text(entryToDelete?.formatTimeList() ?: "")
+            }
+        )
+    }
+}
+
+@Composable
+private fun DeleteByTypeDialog(mainViewModel: MainViewModel = viewModel()) {
+    val showDeleteByTypeDialog by mainViewModel.showDeleteByTypeDialog.collectAsState()
+
+    if (showDeleteByTypeDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                mainViewModel.setShowDeleteByTypeDialog(false)
+            },
+            title = {
+                Text("Удалить все записи этого типа?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mainViewModel.setShowDeleteByTypeDialog(false)
+                        mainViewModel.deleteByType()
+                    },
+                ) {
+                    Text("Да")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        mainViewModel.setShowDeleteByTypeDialog(false)
+                    },
+                ) {
+                    Text("Нет")
+                }
+            },
+            text = {}
+        )
     }
 }
 
@@ -238,6 +282,10 @@ private fun ItemTop(modifier: Modifier, entry: Entry?, type: Int, mainViewModel:
                 .combinedClickable(
                     onClick = {
                         mainViewModel.setCurrentType(type)
+                    },
+                    onLongClick = {
+                        mainViewModel.setTypeToDelete(type)
+                        mainViewModel.setShowDeleteByTypeDialog(true)
                     }
                 )
         ) {

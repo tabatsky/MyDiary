@@ -8,6 +8,6 @@ import javax.inject.Inject
 class DeleteUseCase @Inject constructor(
     private val entryDao: EntryDao
 ) {
-    fun execute(entry: Entry) = entryDao
+    suspend fun execute(entry: Entry) = entryDao
         .delete(entry.toEntryEntity())
 }

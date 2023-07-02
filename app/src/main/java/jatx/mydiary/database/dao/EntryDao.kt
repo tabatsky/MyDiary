@@ -13,11 +13,14 @@ interface EntryDao {
     suspend fun getAllSuspend(): List<EntryEntity>
 
     @Insert
-    fun insert(entryEntity: EntryEntity)
+    suspend fun insert(entryEntity: EntryEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertReplaceList(list: List<EntryEntity>)
 
     @Delete
-    fun delete(entryEntity: EntryEntity)
+    suspend fun delete(entryEntity: EntryEntity)
+
+    @Query("DELETE FROM entries WHERE type=:type")
+    suspend fun deleteByType(type: Int)
 }
