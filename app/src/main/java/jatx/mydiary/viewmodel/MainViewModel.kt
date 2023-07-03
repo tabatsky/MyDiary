@@ -29,6 +29,7 @@ class MainViewModel @Inject constructor(
     private val insertUseCase: InsertUseCase,
     private val deleteUseCase: DeleteUseCase,
     private val deleteByTypeUseCase: DeleteByTypeUseCase,
+    private val deleteAllUseCase: DeleteAllUseCase,
     private val insertReplaceListUseCase: InsertReplaceListUseCase,
     private val toasts: Toasts
 ): ViewModel() {
@@ -191,6 +192,7 @@ class MainViewModel @Inject constructor(
                     sc.close()
                     val backupData = Gson().fromJson(backupDataStr, BackupData::class.java)
                     Log.e("backup", backupData.toString())
+                    deleteAllUseCase.execute()
                     insertReplaceListUseCase.execute(backupData.list)
                     withContext(Dispatchers.Main) {
                         toasts.showToast(R.string.toast_load_data_success)

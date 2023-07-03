@@ -23,4 +23,7 @@ interface EntryDao {
 
     @Query("DELETE FROM entries WHERE type=:type")
     suspend fun deleteByType(type: Int)
+
+    @Query("DELETE FROM entries")
+    suspend fun deleteAll()
 }
