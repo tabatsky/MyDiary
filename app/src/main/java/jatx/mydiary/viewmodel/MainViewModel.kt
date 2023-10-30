@@ -51,9 +51,6 @@ class MainViewModel @Inject constructor(
     private val _typeToDelete = MutableStateFlow(-1)
     val typeToDelete = _typeToDelete.asStateFlow()
 
-    private val _invalidateCounter = MutableStateFlow(0)
-    val invalidateCounter = _invalidateCounter.asStateFlow()
-
     private var _typeForEntry = MutableStateFlow(-1)
     private val typeForEntry = _typeForEntry.asStateFlow()
 
@@ -108,7 +105,6 @@ class MainViewModel @Inject constructor(
                     .collect {
                         withContext(Dispatchers.Main) {
                             _entries.value = it
-                            _invalidateCounter.value += 1
                         }
                     }
             }

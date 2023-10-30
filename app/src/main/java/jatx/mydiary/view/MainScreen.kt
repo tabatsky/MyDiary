@@ -1,6 +1,5 @@
-package jatx.mydiary
+package jatx.mydiary.view
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import jatx.mydiary.R
 import jatx.mydiary.domain.models.Entry
 import jatx.mydiary.domain.models.formatTimeList
 import jatx.mydiary.domain.models.formatTimeTop
@@ -34,14 +34,10 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
             .fillMaxSize()
     ) {
         val W = this.maxWidth
-        val H = this.maxHeight
 
         val A = W / 6
 
-        val invalidateCounter by mainViewModel.invalidateCounter.collectAsState()
-
         val entries by mainViewModel.entries.collectAsState()
-        Log.e("entries", entries.map { it.formatTimeList() }.toString())
 
         val topEntries = (1 .. 6)
             .toList()
