@@ -182,11 +182,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val inFile = File(
-                        Environment
-                            .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-                        "MyDiary.json"
-                    )
                     val sc = Scanner(appContext.contentResolver.openInputStream(uri))
                     val backupDataStr = sc.nextLine()
                     sc.close()
