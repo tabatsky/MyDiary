@@ -3,6 +3,7 @@ package jatx.mydiary
 import android.Manifest
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.os.Build
 import android.os.Bundle
 import android.widget.TimePicker
 import androidx.activity.ComponentActivity
@@ -100,12 +101,24 @@ class MainActivity : ComponentActivity() {
 
     private fun loadData() = loadLauncher.launch(arrayOf("*/*"))
 
-    private fun saveData() = saveLauncher.launch(
-        arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
-    )
+    private fun saveData() {
+        if (Build.VERSION.SDK_INT <= 29) {
+            saveLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            )
+        } else if (Build.VERSION.SDK_INT <= 32) {
+            saveLauncher.launch(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                )
+            )
+        } else {
+            mainViewModel.onSavePermissionGranted()
+        }
+    }
 
     private fun selectDateAndTime(onSuccess: () -> Unit) {
         calendar = Calendar.getInstance()

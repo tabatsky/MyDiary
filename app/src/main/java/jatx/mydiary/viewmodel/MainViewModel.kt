@@ -218,11 +218,12 @@ class MainViewModel @Inject constructor(
                     pw.println(backupDataStr)
                     pw.flush()
                     pw.close()
+                    Log.e("success", "saving")
                     withContext(Dispatchers.Main) {
                         toasts.showToast(R.string.toast_save_data_success)
                     }
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Log.e("error", "saving", e)
                     withContext(Dispatchers.Main) {
                         toasts.showToast(R.string.toast_some_error)
                     }
