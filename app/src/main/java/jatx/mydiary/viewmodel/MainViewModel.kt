@@ -1,11 +1,14 @@
 package jatx.mydiary.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jatx.mydiary.R
 import jatx.mydiary.backup.BackupData
 import jatx.mydiary.domain.models.Entry
@@ -31,7 +34,8 @@ class MainViewModel @Inject constructor(
     private val deleteByTypeUseCase: DeleteByTypeUseCase,
     private val deleteAllUseCase: DeleteAllUseCase,
     private val insertReplaceListUseCase: InsertReplaceListUseCase,
-    private val toasts: Toasts
+    private val toasts: Toasts,
+    @ApplicationContext private val appContext: Context
 ): ViewModel() {
     private val _entries = MutableStateFlow(listOf<Entry>())
     val entries = _entries.asStateFlow()
@@ -174,7 +178,7 @@ class MainViewModel @Inject constructor(
     }
 
 
-    fun onLoadPermissionGranted() {
+    fun onLoadFromUri(uri: Uri) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -183,7 +187,7 @@ class MainViewModel @Inject constructor(
                             .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
                         "MyDiary.json"
                     )
-                    val sc = Scanner(inFile)
+                    val sc = Scanner(appContext.contentResolver.openInputStream(uri))
                     val backupDataStr = sc.nextLine()
                     sc.close()
                     val backupData = Gson().fromJson(backupDataStr, BackupData::class.java)

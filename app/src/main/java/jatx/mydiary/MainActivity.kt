@@ -29,10 +29,10 @@ class MainActivity : ComponentActivity() {
 
     private val loadLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
+            ActivityResultContracts.OpenDocument()
         ) {
-            if (it) {
-                mainViewModel.onLoadPermissionGranted()
+            it?.let { uri ->
+                mainViewModel.onLoadFromUri(uri)
             }
         }
 
@@ -98,9 +98,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun loadData() = loadLauncher.launch(
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    )
+    private fun loadData() = loadLauncher.launch(arrayOf("*/*"))
 
     private fun saveData() = saveLauncher.launch(
         arrayOf(
