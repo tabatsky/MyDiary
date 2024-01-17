@@ -213,7 +213,7 @@ class MainViewModel @Inject constructor(
                     val dir = Environment
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
                     dir.mkdirs()
-                    val outFile = File(dir, "MyDiary.json")
+                    val outFile = File(dir, "MyDiary.json.txt")
                     val pw = PrintWriter(outFile)
                     pw.println(backupDataStr)
                     pw.flush()
