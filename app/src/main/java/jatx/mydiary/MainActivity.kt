@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.TimePicker
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -56,6 +57,9 @@ class MainActivity : ComponentActivity() {
         mainViewModel.init()
 
         setContent {
+            BackHandler {
+                finish()
+            }
             MainScreen()
         }
 
