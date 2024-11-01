@@ -17,8 +17,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import jatx.mydiary.view.MainScreen
-import jatx.mydiary.viewmodel.MainViewModel
+import jatx.mydiary.navigation.Router
+import jatx.mydiary.navigation.ScreenVariant
+import jatx.mydiary.presentation.auth.AuthScreen
+import jatx.mydiary.presentation.auth.AuthViewModel
+import jatx.mydiary.presentation.main.MainScreen
+import jatx.mydiary.presentation.main.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,6 +32,7 @@ import java.util.*
 class MainActivity : ComponentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
 
     private val loadLauncher =
         registerForActivityResult(
@@ -55,12 +60,22 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         mainViewModel.init()
+        authViewModel.init()
 
         setContent {
             BackHandler {
-                finish()
+                if (Router.currentScreenVariant == ScreenVariant.MainScreenVariant) {
+                    finish()
+                } else {
+                    Router.pop()
+                }
             }
-            MainScreen()
+            when(Router.currentScreenVariant) {
+                is ScreenVariant.MainScreenVariant ->
+                    MainScreen()
+                is ScreenVariant.AuthScreenVariant ->
+                    AuthScreen()
+            }
         }
 
         lifecycleScope.launch {

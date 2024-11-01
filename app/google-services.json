@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "891369092638",
+    "project_id": "mydiary-edd8f",
+    "storage_bucket": "mydiary-edd8f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:891369092638:android:7788f47b639bf08066e00f",
+        "android_client_info": {
+          "package_name": "jatx.mydiary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAN5t2cgxhVOW8zfIJ7mQrSnSKzUorVFHQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

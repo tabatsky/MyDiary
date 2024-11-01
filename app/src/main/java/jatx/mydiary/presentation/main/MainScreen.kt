@@ -1,4 +1,4 @@
-package jatx.mydiary.view
+package jatx.mydiary.presentation.main
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -23,7 +23,8 @@ import jatx.mydiary.R
 import jatx.mydiary.domain.models.Entry
 import jatx.mydiary.domain.models.formatTimeList
 import jatx.mydiary.domain.models.formatTimeTop
-import jatx.mydiary.viewmodel.MainViewModel
+import jatx.mydiary.navigation.Router
+import jatx.mydiary.navigation.ScreenVariant
 
 @ExperimentalGraphicsApi
 @ExperimentalFoundationApi
@@ -363,6 +364,13 @@ private fun MainScreenActions() {
         }) {
             Text(
                 text = stringResource(id = R.string.item_save)
+            )
+        }
+        DropdownMenuItem(onClick = {
+            Router.push(ScreenVariant.AuthScreenVariant)
+        }) {
+            Text(
+                text = stringResource(R.string.item_auth)
             )
         }
     }

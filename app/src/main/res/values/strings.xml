@@ -5,4 +5,11 @@
     <string name="toast_load_data_success">Загружено успешно</string>
     <string name="item_load">Загрузить</string>
     <string name="item_save">Выгрузить</string>
+    <string name="item_auth">Авторизация</string>
+    <string name="toast_need_login">Необходима авторизация</string>
+    <string name="toast_sign_in_success">Авторизация успешна</string>
+    <string name="toast_sign_in_error">Ошибка авторизации</string>
+    <string name="toast_sign_up_success">Регистрация успешна</string>
+    <string name="toast_sign_up_error">Ошибка регистрации</string>
+    <string name="toast_fill_email_and_password">Заполните e-mail и пароль</string>
 </resources>

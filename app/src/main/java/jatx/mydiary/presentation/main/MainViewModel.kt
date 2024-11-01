@@ -1,4 +1,4 @@
-package jatx.mydiary.viewmodel
+package jatx.mydiary.presentation.main
 
 import android.content.Context
 import android.net.Uri

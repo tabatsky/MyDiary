@@ -1,4 +1,4 @@
-package jatx.mydiary.view
+package jatx.mydiary.presentation.main
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
