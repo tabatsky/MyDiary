@@ -6,10 +6,13 @@ import android.os.Environment
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jatx.mydiary.R
+import jatx.mydiary.auth.AppAuth
 import jatx.mydiary.backup.BackupData
 import jatx.mydiary.domain.models.Entry
 import jatx.mydiary.domain.usecase.*
@@ -35,8 +38,12 @@ class MainViewModel @Inject constructor(
     private val deleteAllUseCase: DeleteAllUseCase,
     private val insertReplaceListUseCase: InsertReplaceListUseCase,
     private val toasts: Toasts,
+    private val appAuth: AppAuth,
     @ApplicationContext private val appContext: Context
 ): ViewModel() {
+
+    val db = Firebase.firestore
+
     private val _entries = MutableStateFlow(listOf<Entry>())
     val entries = _entries.asStateFlow()
 
@@ -239,6 +246,73 @@ class MainViewModel @Inject constructor(
 
     fun saveData() {
         onSavePermissionRequest()
+    }
+
+    fun loadDataFromFirestore() {
+        appAuth.theUser?.let { theUser ->
+            val userUid = theUser.uid
+
+            db.collection("backups")
+                .document(userUid)
+                .get()
+                .addOnSuccessListener { document ->
+                    document?.let {
+                        Log.e("load", "${document.id} => ${document.data}")
+                        (document.data?.get("backupDataStr") as? String)?.let { backupDataStr ->
+                            val backupData = Gson().fromJson(backupDataStr, BackupData::class.java)
+                            Log.e("backup", backupData.toString())
+                            viewModelScope.launch {
+                                withContext(Dispatchers.IO) {
+                                    deleteAllUseCase.execute()
+                                    insertReplaceListUseCase.execute(backupData.list)
+                                }
+                                withContext(Dispatchers.Main) {
+                                    toasts.showToast(R.string.toast_load_data_success)
+                                }
+                            }
+                        } ?: run {
+                            toasts.showToast(R.string.toast_some_error)
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("load", "error", exception)
+                    toasts.showToast(R.string.toast_some_error)
+                }
+        } ?: run {
+            toasts.showToast(R.string.toast_need_login)
+        }
+    }
+
+    fun saveDataToFirestore() {
+        appAuth.theUser?.let { theUser ->
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val list = getAllSuspendUseCase.execute()
+                    val backupData = BackupData(list)
+                    val backupDataStr = Gson().toJson(backupData)
+                    val userUid = theUser.uid
+
+                    val doc = hashMapOf(
+                        "backupDataStr" to backupDataStr
+                    )
+
+                    db.collection("backups")
+                        .document(userUid)
+                        .set(doc)
+                        .addOnSuccessListener {
+                            Log.e("save", "success")
+                            toasts.showToast(R.string.toast_save_data_success)
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("save", "error", e)
+                            toasts.showToast(R.string.toast_some_error)
+                        }
+                }
+            }
+        } ?: run {
+            toasts.showToast(R.string.toast_need_login)
+        }
     }
 
     fun showDateTimePicker() {

@@ -1,17 +1,15 @@
 package jatx.mydiary.domain.models
 
-import jatx.mydiary.database.entity.EntryEntity
 import java.text.SimpleDateFormat
 import java.util.*
 
-class Entry(
+data class Entry(
     val id: Long? = null,
     val type: Int,
     val time: Long
 )
 
 fun Entry.formatTimeList(): String {
-    val dt = System.currentTimeMillis() - time
     val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
     val date = Date()
     date.time = time

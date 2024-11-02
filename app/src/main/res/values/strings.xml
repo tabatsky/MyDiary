@@ -6,6 +6,8 @@
     <string name="item_load">Загрузить</string>
     <string name="item_save">Выгрузить</string>
     <string name="item_auth">Авторизация</string>
+    <string name="item_save_firestore">Выгрузить Firestore</string>
+    <string name="item_load_firestore">Загрузить Firestore</string>
     <string name="toast_need_login">Необходима авторизация</string>
     <string name="toast_sign_in_success">Авторизация успешна</string>
     <string name="toast_sign_in_error">Ошибка авторизации</string>

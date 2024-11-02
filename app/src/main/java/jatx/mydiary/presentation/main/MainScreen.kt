@@ -373,6 +373,20 @@ private fun MainScreenActions() {
                 text = stringResource(R.string.item_auth)
             )
         }
+        DropdownMenuItem(onClick = {
+            mainViewModel.loadDataFromFirestore()
+        }) {
+            Text(
+                text = stringResource(R.string.item_load_firestore)
+            )
+        }
+        DropdownMenuItem(onClick = {
+            mainViewModel.saveDataToFirestore()
+        }) {
+            Text(
+                text = stringResource(R.string.item_save_firestore)
+            )
+        }
     }
 }
 
