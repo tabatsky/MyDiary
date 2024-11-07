@@ -13,19 +13,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import jatx.mydiary.consumer.EventConsumer
 import jatx.mydiary.navigation.Router
 import jatx.mydiary.navigation.ScreenVariant
 import jatx.mydiary.presentation.auth.AuthScreen
 import jatx.mydiary.presentation.auth.AuthViewModel
 import jatx.mydiary.presentation.main.MainScreen
 import jatx.mydiary.presentation.main.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 @AndroidEntryPoint
@@ -70,50 +65,23 @@ class MainActivity : ComponentActivity() {
                     Router.pop()
                 }
             }
+            EventConsumer(mainViewModel.loadChannel) {
+                loadData()
+            }
+            EventConsumer(mainViewModel.saveChannel) {
+                saveData()
+            }
+            EventConsumer(mainViewModel.showDateTimePickerChannel) {
+                selectDateAndTime {
+                    val time = calendar?.timeInMillis ?: System.currentTimeMillis()
+                    mainViewModel.createEntry(time)
+                }
+            }
             when(Router.currentScreenVariant) {
                 is ScreenVariant.MainScreenVariant ->
                     MainScreen()
                 is ScreenVariant.AuthScreenVariant ->
                     AuthScreen()
-            }
-        }
-
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                withContext(Dispatchers.Default) {
-                    mainViewModel.loadFlow.collect {
-                        withContext(Dispatchers.Main) {
-                            loadData()
-                        }
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                withContext(Dispatchers.Default) {
-                    mainViewModel.saveFlow.collect {
-                        withContext(Dispatchers.Main) {
-                           saveData()
-                        }
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                withContext(Dispatchers.Default) {
-                    mainViewModel.dateTimePickerFlow.collect {
-                        withContext(Dispatchers.Main) {
-                            selectDateAndTime {
-                                val time = calendar?.timeInMillis ?: System.currentTimeMillis()
-                                mainViewModel.createEntry(time)
-                            }
-                        }
-                    }
-                }
             }
         }
     }

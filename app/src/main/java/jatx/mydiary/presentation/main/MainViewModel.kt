@@ -19,7 +19,8 @@ import jatx.mydiary.domain.usecase.*
 import jatx.mydiary.toasts.Toasts
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,38 +66,16 @@ class MainViewModel @Inject constructor(
     private var _typeForEntry = MutableStateFlow(-1)
     private val typeForEntry = _typeForEntry.asStateFlow()
 
-    private var onLoadPermissionRequest: () -> Unit = {}
-    private var onSavePermissionRequest: () -> Unit = {}
-    private var onShowDateTimePicker: () -> Unit = {}
-
     private var getAllJob: Job? = null
 
-    val loadFlow: Flow<Any?> = callbackFlow {
-        onLoadPermissionRequest = {
-            trySend(null)
-        }
-        awaitClose {
-            onLoadPermissionRequest = {}
-        }
-    }
+    private val _loadChannel = Channel<Unit>()
+    val loadChannel: ReceiveChannel<Unit> = _loadChannel
 
-    val saveFlow: Flow<Any?> = callbackFlow {
-        onSavePermissionRequest = {
-            trySend(null)
-        }
-        awaitClose {
-            onSavePermissionRequest = {}
-        }
-    }
+    private val _saveChannel = Channel<Unit>()
+    val saveChannel: ReceiveChannel<Unit> = _saveChannel
 
-    val dateTimePickerFlow: Flow<Any?> = callbackFlow {
-        onShowDateTimePicker = {
-            trySend(null)
-        }
-        awaitClose {
-            onShowDateTimePicker = {}
-        }
-    }
+    private val _showDateTimePickerChannel = Channel<Unit>()
+    val showDateTimePickerChannel: ReceiveChannel<Unit> = _showDateTimePickerChannel
 
     fun init() {
         getAllJob?.let {
@@ -241,11 +220,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun loadData() {
-        onLoadPermissionRequest()
+        _loadChannel.trySend(Unit)
     }
 
     fun saveData() {
-        onSavePermissionRequest()
+        _saveChannel.trySend(Unit)
     }
 
     fun loadDataFromFirestore() {
@@ -316,6 +295,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun showDateTimePicker() {
-        onShowDateTimePicker()
+        _showDateTimePickerChannel.trySend(Unit)
     }
 }
