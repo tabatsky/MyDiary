@@ -57,11 +57,11 @@ class AppAuth @Inject constructor(
             .addOnCompleteListener(executor) { task ->
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
-                    val user = auth.currentUser
+                    val user = task.result.user
                     Log.e("user", user?.uid.toString())
                     saveAuth(email, password)
-                    toasts.showToast(R.string.toast_sign_in_success)
                     theUser = user
+                    toasts.showToast(R.string.toast_sign_in_success)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.e("sign in", "signInWithEmail:failure", task.exception)
